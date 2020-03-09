@@ -17,6 +17,10 @@ public class ClientHandler implements Runnable {
         this.s = s;
     }
 
+    public String getName() {
+        return name;
+    }
+
     @Override
 
     public void run() {
@@ -25,21 +29,20 @@ public class ClientHandler implements Runnable {
             try {
                 received = dis.readUTF();
                 if (received.equals("logout")) {
-                    System.out.println("Logout");
-                    // Remove this client:
-
-
+                    System.out.println("[OK] User [" + this.name + "] logged out.");
                     this.s.close();
+                    ConsoleServer.removeClient(this.name);
                     break;
                 }
-                StringTokenizer stk = new StringTokenizer("#");
+                StringTokenizer stk = new StringTokenizer(received, "#");
                 String recipient = stk.nextToken();
                 String content = stk.nextToken();
-                ConsoleServer.clientHandlerMap.get(recipient).dos.writeUTF("3#" + name + "#" + content);
-
-            } catch (IOException e) {
+                ConsoleServer.clientHandlerMap.get(recipient).dos.writeUTF("5#" + name + "#" + content);
+                Thread.sleep(1000);
+            } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
             }
+
         }
         try {
             this.dis.close();
